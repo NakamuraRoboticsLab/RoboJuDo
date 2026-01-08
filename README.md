@@ -321,6 +321,15 @@ We have the same Keyboard control as ASAP:
 - `;` toggle next mimic policy
 - `'` toggle prev mimic policy
 
+Unitree Remote (g1_locomimic_beyondmimic_real):
+- A: Emergency stop (shutdown)
+- Select: Switch to LocoMotion
+- Start: Switch to Motion Mimic (BeyondMimic)
+- R1: Switch to next mimic policy
+- L1: Switch to previous mimic policy
+
+Note: Safety check is enabled by default for the real-robot config (do_safety_check=True). See [robojudo/config/g1/g1_loco_mimic_cfg.py](robojudo/config/g1/g1_loco_mimic_cfg.py).
+
 <div align="center">
 <img src="docs/images/locomimic_asap.gif" width="20%" alt="locomimic_asap"/>
 </div>
