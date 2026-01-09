@@ -65,7 +65,8 @@ class G1BeyondMimicPolicyCfg(BeyondMimicPolicyCfg):
 
     # policy_name: str = "Jump_wose"
     # policy_name: str = "Dance_wose"
-    policy_name: str = "Run"
+    # policy_name: str = "Run"
+    policy_name: str = "Run2"
     # policy_name: str = "Violin"
     # policy_name: str = "Waltz"
 
