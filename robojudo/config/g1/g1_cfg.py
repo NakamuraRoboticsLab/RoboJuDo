@@ -316,6 +316,7 @@ class g1_switch_beyondmimic(RlMultiPolicyPipelineCfg):
                 "#": "[POLICY_SWITCH],2",  # note: with shift
                 "$": "[POLICY_SWITCH],3",  # note: with shift
                 "%": "[POLICY_SWITCH],4",  # note: with shift
+                "^": "[POLICY_SWITCH],5",  # note: with shift
             }
         ),
         JoystickCtrlCfg(
@@ -325,6 +326,7 @@ class g1_switch_beyondmimic(RlMultiPolicyPipelineCfg):
                 "RB+Up": "[POLICY_SWITCH],2",
                 "RB+Right": "[POLICY_SWITCH],3",
                 "LB+Down": "[POLICY_SWITCH],4",
+                "LB+Left": "[POLICY_SWITCH],5",
             }
         ),
     ]
@@ -335,6 +337,7 @@ class g1_switch_beyondmimic(RlMultiPolicyPipelineCfg):
         G1BeyondMimicPolicyCfg(policy_name="Waltz", without_state_estimator=False, max_timestep=850),
         G1BeyondMimicPolicyCfg(policy_name="Dance_wose", without_state_estimator=True),
         G1BeyondMimicPolicyCfg(policy_name="Run", without_state_estimator=False),
+        G1BeyondMimicPolicyCfg(policy_name="Run2", without_state_estimator=False),
     ]
 
 

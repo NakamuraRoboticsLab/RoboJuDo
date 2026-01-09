@@ -76,6 +76,7 @@ class g1_locomimic_beyondmimic(G1RlLocoMimicPipelineCfg):
         G1BeyondMimicPolicyCfg(policy_name="Violin", without_state_estimator=False, max_timestep=500),
         G1BeyondMimicPolicyCfg(policy_name="Waltz", without_state_estimator=False, max_timestep=850),
         G1BeyondMimicPolicyCfg(policy_name="Run", without_state_estimator=False),
+        G1BeyondMimicPolicyCfg(policy_name="Run2", without_state_estimator=False),
     ]
 
 
