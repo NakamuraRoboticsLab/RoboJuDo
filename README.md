@@ -315,6 +315,12 @@ python scripts/run_pipeline.py -c g1_locomimic_beyondmimic
 python scripts/run_pipeline.py -c g1_locomimic_asap
 ```
 
+### Sim-to-real experiment
+```bash
+python scripts/run_pipeline.py -c g1_locomimic_beyondmimic_real
+python scripts/run_pipeline.py -c g1_locomimic_asap_real
+```
+
 We have the same Keyboard control as ASAP:
 - `[` to switch to MotionMimic
 - `]` to switch to LocoMotion
