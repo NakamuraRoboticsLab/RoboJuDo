@@ -1,4 +1,5 @@
 import logging
+import os
 import time
 
 import numpy as np
@@ -13,6 +14,20 @@ from robojudo.utils.util_func import quat_rotate_inverse_np
 logger = logging.getLogger(__name__)
 
 
+def _list_network_interfaces() -> list[str]:
+    sys_class_net = "/sys/class/net"
+    try:
+        return sorted(
+            [
+                name
+                for name in os.listdir(sys_class_net)
+                if os.path.isdir(os.path.join(sys_class_net, name))
+            ]
+        )
+    except FileNotFoundError:
+        return []
+
+
 @env_registry.register
 class UnitreeCppEnv(Environment):
     cfg_env: UnitreeEnvCfg
@@ -23,6 +38,17 @@ class UnitreeCppEnv(Environment):
         self.RemoteControllerHandler = None
 
         cfg_unitree: UnitreeEnvCfg.UnitreeCfg = cfg_env.unitree
+
+        available_net_ifs = _list_network_interfaces()
+        if available_net_ifs and cfg_unitree.net_if not in available_net_ifs:
+            raise RuntimeError(
+                "Invalid Unitree network interface (net_if). "
+                f"Configured net_if='{cfg_unitree.net_if}', but available interfaces "
+                f"are: {available_net_ifs}. "
+                "Fix by updating cfg_env.unitree.net_if (e.g. in "
+                "robojudo/config/g1/env/g1_real_env_cfg.py or the selected "
+                "pipeline cfg)."
+            )
 
         cfg_unitree_dict: dict = cfg_unitree.to_dict()
         cfg_unitree_dict["num_dofs"] = self.num_dofs
