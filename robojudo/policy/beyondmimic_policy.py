@@ -83,6 +83,43 @@ class BeyondMimicPolicy(Policy):
         self.override_robot_anchor_pos = self.cfg_policy.override_robot_anchor_pos
         self.use_motion_from_model = self.cfg_policy.use_motion_from_model
 
+        # Reconcile observation size with model expectation.
+        # Some BeyondMimic models are exported with/without the state-estimator terms
+        # (lin_vel + anchor_pos), which differ by 6 dims.
+        try:
+            sess_obs_dim = int(self.session.get_inputs()[0].shape[1])
+        except Exception:
+            sess_obs_dim = None
+
+        if sess_obs_dim is not None:
+            obs_n = int(self.cfg_policy.obs_dof.num_dofs)
+            act_n = int(self.cfg_policy.action_dof.num_dofs)
+            expected_with_se = 4 * obs_n + act_n + 15
+            expected_wo_se = 4 * obs_n + act_n + 9
+
+            if sess_obs_dim == expected_with_se and self.without_state_estimator:
+                logger.warning(
+                    "[BeyondMimicPolicy] Model expects obs_dim=%d (with state estimator), "
+                    "but cfg without_state_estimator=True. Auto-setting without_state_estimator=False.",
+                    sess_obs_dim,
+                )
+                self.without_state_estimator = False
+            elif sess_obs_dim == expected_wo_se and (not self.without_state_estimator):
+                logger.warning(
+                    "[BeyondMimicPolicy] Model expects obs_dim=%d (without state estimator), "
+                    "but cfg without_state_estimator=False. Auto-setting without_state_estimator=True.",
+                    sess_obs_dim,
+                )
+                self.without_state_estimator = True
+            elif sess_obs_dim not in (expected_with_se, expected_wo_se):
+                logger.warning(
+                    "[BeyondMimicPolicy] Unexpected obs_dim=%d from model; expected %d or %d based on dof config. "
+                    "If this model uses a different observation layout, you may need to update get_observation().",
+                    sess_obs_dim,
+                    expected_with_se,
+                    expected_wo_se,
+                )
+
         self.max_timestep = self.cfg_policy.max_timestep
         self.command = None
         self.reset()
@@ -224,6 +261,14 @@ class BeyondMimicPolicy(Policy):
         return obs, extras
 
     def get_action(self, obs: np.ndarray) -> np.ndarray:
+        # Friendly shape check before calling onnxruntime.
+        expected_dim = self.session.get_inputs()[0].shape[1]
+        if expected_dim is not None and obs.shape[-1] != expected_dim:
+            raise ValueError(
+                f"BeyondMimicPolicy obs dim mismatch: got {obs.shape[-1]}, expected {expected_dim}. "
+                f"This is usually caused by a wrong without_state_estimator setting for model '{self.cfg_policy.policy_name}'."
+            )
+
         ort_inputs = {
             "obs": np.expand_dims(obs, axis=0).astype(np.float32),
             "time_step": np.expand_dims(np.array([int(self.timestep)]), axis=0).astype(np.float32),
